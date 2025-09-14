@@ -74,6 +74,9 @@ int main()
   /*
     my_kernel<<<grid size, block size, size of required shared memory, index of stream>>>
     Launch kernel with 2 blocks of 8 threads each (16 threads total)
+
+    While grid size * block size = DATA_LENGTH this example will run correctly.
+    So 1, 16 or 2, 8 or 4, 4 or 8, 2 or 16, 1 works.
   */
   my_kernel<<<2, 8>>>(device_data_a, device_data_b);
 
