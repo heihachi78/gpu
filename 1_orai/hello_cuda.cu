@@ -1,7 +1,8 @@
-#include <stdio.h>
-#include <cuda.h>
-#include <cuda_runtime.h>
-#define DATA_LENGTH 16
+#include <stdio.h>         // Standard I/O functions (printf)
+#include <cuda.h>          // CUDA runtime API
+#include <cuda_runtime.h>  // Additional CUDA runtime functions
+
+#define DATA_LENGTH 16     // Size of arrays to process
 
 /*
   __global__
@@ -22,21 +23,26 @@ __global__ void my_kernel(int* device_data_a, int* device_data_b)
     with 10 blocks of 256 threads each:
       gridDim.x = 10 and blockDim.x = 256
   */
-  int tid = blockDim.x * blockIdx.x + threadIdx.x;
-  device_data_a[tid] += device_data_b[tid];
+  int tid = blockDim.x * blockIdx.x + threadIdx.x; // Calculate global thread ID
+  device_data_a[tid] += device_data_b[tid]; // Add corresponding elements
 }
 
 int main()
 {
-  int host_data_a[DATA_LENGTH] = {0};
-  int host_data_b[DATA_LENGTH] = {0};
+  // Initialize arrays on CPU (host)
+  int host_data_a[DATA_LENGTH] = {0}; // Will store result
+  int host_data_b[DATA_LENGTH] = {0}; // Input array
+
+  // Fill arrays with initial values
   for(int i=0;i<DATA_LENGTH;i++)
   {
-    host_data_a[i] = 1;
-    host_data_b[i] = i;
+    host_data_a[i] = 1; // Initialize to 1
+    host_data_b[i] = i; // Initialize to index value
   }
-  int* device_data_a;
-  int* device_data_b;
+
+  // Declare pointers for GPU memory
+  int* device_data_a; // Will point to GPU memory for array A
+  int* device_data_b; // Will point to GPU memory for array B
 
   /*
     cudaMalloc((void**)&device_data_a, DATA_LENGTH * sizeof(int)); allocates memory on the GPU.
@@ -48,8 +54,9 @@ int main()
 
   The function modifies device_data_a to point to the newly allocated GPU memory.
   */
-  cudaMalloc((void**)&device_data_a, DATA_LENGTH * sizeof(int));
-  cudaMalloc((void**)&device_data_b, DATA_LENGTH * sizeof(int));
+  // Allocate memory on GPU
+  cudaMalloc((void**)&device_data_a, DATA_LENGTH * sizeof(int)); // Allocate GPU memory for array A
+  cudaMalloc((void**)&device_data_b, DATA_LENGTH * sizeof(int)); // Allocate GPU memory for array B
 
   /*
     cudaMemcpyHostToDevice copies data from CPU memory (host) to GPU memory (device).
@@ -60,23 +67,28 @@ int main()
     - cudaMemcpyDeviceToDevice - GPU to GPU
     - cudaMemcpyHostToHost - CPU to CPU
   */
+  // Copy data from CPU to GPU
   cudaMemcpy(device_data_a, host_data_a, DATA_LENGTH * sizeof(int), cudaMemcpyHostToDevice);
   cudaMemcpy(device_data_b, host_data_b, DATA_LENGTH * sizeof(int), cudaMemcpyHostToDevice);
 
   /*
     my_kernel<<<grid size, block size, size of required shared memory, index of stream>>>
+    Launch kernel with 2 blocks of 8 threads each (16 threads total)
   */
   my_kernel<<<2, 8>>>(device_data_a, device_data_b);
 
+  // Copy result back from GPU to CPU
   cudaMemcpy(host_data_a, device_data_a, DATA_LENGTH * sizeof(int), cudaMemcpyDeviceToHost);
-  
+
+  // Print results
   for(int i=0;i<DATA_LENGTH;i++)
   {
-    printf("%d - %d\n", i, host_data_a[i]);
+    printf("%d - %d\n", i, host_data_a[i]); // Print index and result
   }
 
-  cudaFree(device_data_a)
-  cudaFree(device_data_b)
+  // Free GPU memory
+  cudaFree(device_data_a);
+  cudaFree(device_data_b);
 
   return 0;
 }
