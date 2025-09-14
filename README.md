@@ -3,9 +3,9 @@ J0P7MF - GPU programozas (PEMIK)
 # whats needed
 (or at least, how i use this repo)
 - WIN11
-- WSL2
-- CUDA compatible card
-- CUDA toolkit
+- WSL2 (Debian, but i imagine it works on other distros)
+- CUDA compatible graphic card
+- CUDA toolkit (https://developer.nvidia.com/cuda-downloads)
 - CUDA driver
 - make sure nvcc is installed
   - nvcc --version
