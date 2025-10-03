@@ -84,6 +84,9 @@ void mxm_test_serial(int N)
 
 int main()
 {
-    mxm_test_serial(32);
+    for(int i=2; i<2048; i=i*2)
+    {
+        mxm_test_serial(i);
+    }
     return 0;
 }
