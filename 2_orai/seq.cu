@@ -1,16 +1,23 @@
 #include <stdio.h>
 #include <cuda.h>
 #include <cuda_runtime.h>
+#include <device_launch_parameters.h>
 #include "prelude.h"
 #include <chrono>
 
 __global__ void mxm_naive_kernel(int N, float* a, float* b, float* c)
 {
-    int j= blockIdx.x * blockDim.x + threadIdx.x;
+    int j = blockIdx.x * blockDim.x + threadIdx.x;
     int i = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if(i>=N || j>=N)
+    {
+        return;
+    }
+
     float tmp = 0;
     for (int k=0; k<N; k++){
-    tmp += a[i*N+k] * b[k*N+j];
+        tmp += a[i*N+k] * b[k*N+j];
     }
     c[i * N + j] = tmp;
 }
@@ -90,7 +97,7 @@ void mxm_test_gpu(int N)
     // call the kernel
     dim3 block(32, 32);
     dim3 grid((N+block.x-1)/block.x, (N+block.y-1)/block.y);
-    mxm_naive_kernel<<<grid, block>>>(N, a, b, c);
+    mxm_naive_kernel<<<grid, block>>>(N, d_a, d_b, d_c);
 
     CUDA_LASTERR();
 
@@ -151,7 +158,8 @@ void mxm_test_serial(int N)
 
 int main()
 {
-    for(int i=2; i<2048; i=i*2)
+    mxm_test_gpu(16);
+    for(int i=2; i<1024; i=i*2)
     {
         mxm_test_serial(i);
     }
