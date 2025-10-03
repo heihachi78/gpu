@@ -12,10 +12,18 @@ J0P7MF - GPU programozas (PEMIK)
   - sometime its installed, but not in the path, in this case you can use something like this: 'export PATH=/usr/local/cuda-13.0/bin:$PATH' >> ~/.zshrc
 
 # compile (example)
-nvcc ./1_orai/hello_cuda.cu -o ./1_orai/hello_cuda
+if you do not know the shader model capability of your card then run this: nvidia-smi --query-gpu=compute_cap --format=csv
+
+- nvcc -O2 ./1_orai/hello_cuda.cu -arch=sm_89 -o ./1_orai/hello_cuda
+- nvcc -O2 ./2_orai/varlenvec.cu -arch=sm_89 -o ./2_orai/varlenvec
+
+Here O2 means optimize for speed, arch means your card's shader model compatibility and -o means the output file.
 
 # 1_orai
 - the cpu version was not part of the class, its there for learning purposes
+
+# 2_orai
+- basicly the same as last time, but with calculated grid sizes and error handling
 
 # Collab setup
 !apt-get update -y
@@ -34,3 +42,6 @@ nvcc ./1_orai/hello_cuda.cu -o ./1_orai/hello_cuda
 
 %load_ext nvcc4jupyter
 
+# prelude.h
+
+This is the "error handling" code the teacher wrote. Basicly macros that encapsulates code and handles errors, prints it, aborts the program.
