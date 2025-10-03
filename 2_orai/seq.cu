@@ -99,6 +99,8 @@ void mxm_test_gpu(int N)
     // call the kernel
     dim3 block(32, 32);
     dim3 grid((N+block.x-1)/block.x, (N+block.y-1)/block.y);
+
+    auto calc_start = std::chrono::high_resolution_clock::now();
     mxm_naive_kernel<<<grid, block>>>(N, d_a, d_b, d_c);
 
     CUDA_LASTERR();
@@ -108,9 +110,10 @@ void mxm_test_gpu(int N)
     
     auto end = std::chrono::high_resolution_clock::now();
     auto elapsed_us = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    auto elapsed_calc_us = std::chrono::duration_cast<std::chrono::microseconds>(end - calc_start).count();
 
     // printing the result
-    printf("matrix size: %d, elapsed time on gpu: %f ms\n", N, float(elapsed_us)/1e3);
+    printf("matrix size: %d, elapsed time on gpu: %f ms (with memory copy: %f) \n", N, float(elapsed_calc_us)/1e3, float(elapsed_us)/1e3);
 
     // print the result matrix
     for(int i=0; i < N; i++)
