@@ -97,21 +97,27 @@ void mxm_test_gpu(int N)
     // call the kernel
     dim3 block(32, 32);
     dim3 grid((N+block.x-1)/block.x, (N+block.y-1)/block.y);
+    auto start = std::chrono::high_resolution_clock::now();
     mxm_naive_kernel<<<grid, block>>>(N, d_a, d_b, d_c);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto elapsed_us = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
     CUDA_LASTERR();
 
     // copy data from device to memory
     CUDA_ERROR_CHECK (cudaMemcpy(c, d_c, N*N*sizeof(float), cudaMemcpyDeviceToHost));
 
+    // printing the result
+    printf("matrix size: %d, elapsed time on gpu: %f\n", N, float(elapsed_us)/1e3);
+
     // print the result matrix
     for(int i=0; i < N; i++)
     {
         for(int j=0; j < N; j++)
         {
-            printf("%0.2f ", c[i*N+j]);
+            // printf("%0.2f ", c[i*N+j]);
         }
-        printf("\n");
+        // printf("\n");
     }
 
     // free memory
@@ -140,7 +146,7 @@ void mxm_test_serial(int N)
     auto elapsed_us = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
     // printing the result
-    printf("matrix size: %d, elapsed time: %f\n", N, float(elapsed_us)/1e3);
+    printf("matrix size: %d, elapsed time on cpu: %f\n", N, float(elapsed_us)/1e3);
 
     // print the result matrix
     for(int i=0; i < N; i++)
@@ -158,10 +164,11 @@ void mxm_test_serial(int N)
 
 int main()
 {
-    mxm_test_gpu(16);
     for(int i=2; i<1024; i=i*2)
     {
+        mxm_test_gpu(i);
         mxm_test_serial(i);
     }
+
     return 0;
 }
