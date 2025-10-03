@@ -6,7 +6,13 @@
 
 __global__ void mxm_naive_kernel(int N, float* a, float* b, float* c)
 {
-    
+    int j= blockIdx.x * blockDim.x + threadIdx.x;
+    int i = blockIdx.y * blockDim.y + threadIdx.y;
+    float tmp = 0;
+    for (int k=0; k<N; k++){
+    tmp += a[i*N+k] * b[k*N+j];
+    }
+    c[i * N + j] = tmp;
 }
 
 void mxm_serial(int N, float* a, float* b, float* c)
