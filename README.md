@@ -19,10 +19,18 @@ nvcc ./1_orai/hello_cuda.cu -o ./1_orai/hello_cuda
 
 # Collab setup
 !apt-get update -y
+
 !apt-get install -y cuda-12-4
+
 !sudo rm -rf /usr/local/cuda
+
 !sudo ln -s /usr/local/cuda-12.4 /usr/local/cuda
+
 !export PATH=/usr/local/cuda-12.4/bin:$PATH
+
 !export LD_LIBRARY_PATH=/usr/local/cuda-12.4/lib64:$LD_LIBRARY_PATH
+
 !pip install nvcc4jupyter
+
 %load_ext nvcc4jupyter
+
