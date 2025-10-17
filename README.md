@@ -26,6 +26,9 @@ Here O2 means optimize for speed, arch means your card's shader model compatibil
 - varlenvec.cu: basicly the same as last time, but with calculated grid sizes and error handling
 - seq.cu: naive matrix multiplication on cpu and on gpu, testing the execution times
 
+# 3_orai
+- 
+
 # Collab setup
 !apt-get update -y
 
